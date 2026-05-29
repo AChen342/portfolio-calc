@@ -1,0 +1,222 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrap{background:#0f1117;border-radius:16px;padding:1.5rem;font-family:var(--font-sans)}
+.header{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #1e2130}
+.header-icon{width:36px;height:36px;border-radius:10px;background:#1a2744;display:flex;align-items:center;justify-content:center;color:#5b9cf6;font-size:18px}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem}
+.metric{background:#161b27;border:1px solid #1e2130;border-radius:12px;padding:.875rem 1rem}
+.mlabel{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.mval{font-size:22px;font-weight:500;color:#e8eaf0}
+.mval span{font-size:13px;color:#6b7280;font-weight:400}
+.section{background:#161b27;border:1px solid #1e2130;border-radius:12px;padding:1rem 1.125rem;margin-bottom:1rem}
+.section-label{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem}
+.seg-bar{height:10px;border-radius:99px;overflow:hidden;display:flex;gap:2px;margin-bottom:.625rem}
+.seg{border-radius:99px;transition:width .3s}
+.legend{display:flex;flex-wrap:wrap;gap:10px 18px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#9ca3af}
+.dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.slider-row{display:flex;align-items:center;gap:12px}
+.slider-row label{font-size:13px;color:#9ca3af;white-space:nowrap}
+.slider-row input[type=range]{flex:1;accent-color:#5b9cf6}
+.slider-val{font-size:14px;font-weight:500;color:#e8eaf0;min-width:44px;text-align:right}
+.alloc-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #1e2130;font-size:14px}
+.alloc-row:last-child{border-bottom:none;padding-bottom:0}
+.alloc-left{display:flex;align-items:center;gap:8px;color:#c9cdd8}
+.alloc-right{font-weight:500;color:#e8eaf0}
+.phase-row{padding:10px 0;border-bottom:1px solid #1e2130}
+.phase-row:last-child{border-bottom:none;padding-bottom:0}
+.phase-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.phase-name{font-size:14px;font-weight:500;color:#c9cdd8}
+.tag{font-size:11px;padding:3px 10px;border-radius:99px;font-weight:500}
+.tag-now{background:#0d2e1a;color:#4ade80;border:1px solid #166534}
+.tag-soon{background:#2a1f00;color:#fbbf24;border:1px solid #854d0e}
+.phase-sub{font-size:12px;color:#6b7280}
+.note{display:flex;align-items:flex-start;gap:8px;padding:.75rem 1rem;background:#131824;border:1px solid #1e2130;border-radius:10px;margin-top:.75rem}
+.note i{color:#5b9cf6;font-size:16px;margin-top:1px;flex-shrink:0}
+.note p{font-size:12px;color:#6b7280;line-height:1.6}
+.fund-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #1e2130;font-size:13px}
+.fund-row:last-child{border-bottom:none;padding-bottom:0}
+.fund-name{display:flex;align-items:center;gap:7px;color:#c9cdd8;flex:1;min-width:0}
+.fund-input-wrap{position:relative;flex-shrink:0}
+.fund-input-wrap span{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#6b7280;font-size:13px;pointer-events:none}
+.fund-input{background:#0f1117;border:1px solid #2a2f3d;border-radius:8px;color:#e8eaf0;font-size:13px;padding:5px 8px 5px 20px;width:90px;outline:none;text-align:right}
+.fund-input:focus{border-color:#5b9cf6}
+.total-bar{display:flex;justify-content:space-between;align-items:center;padding:.625rem .875rem;background:#0f1117;border:1px solid #1e2130;border-radius:8px;margin-top:.625rem;font-size:13px}
+.total-bar span:first-child{color:#6b7280}
+.total-bar span:last-child{font-weight:500;color:#e8eaf0}
+</style>
+
+<div class="wrap">
+<h2 style="display:none">Portfolio allocation tracker with editable fund balances and monthly contribution slider.</h2>
+
+<div class="header">
+  <div class="header-icon"><i class="ti ti-chart-pie" aria-hidden="true"></i></div>
+  <div>
+    <div style="font-size:16px;font-weight:500;color:#e8eaf0">Portfolio allocation tracker</div>
+    <div style="font-size:12px;color:#6b7280;margin-top:1px">Brokerage account</div>
+  </div>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <div class="mlabel">Total invested</div>
+    <div class="mval" id="total-display">$546</div>
+  </div>
+  <div class="metric">
+    <div class="mlabel">Monthly contribution</div>
+    <div class="mval" id="contrib-display">$100 <span>/mo</span></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">Current holdings — edit to update</div>
+  <div class="fund-row">
+    <div class="fund-name"><span class="dot" style="background:#5b9cf6"></span>VOO ETF</div>
+    <div class="fund-input-wrap"><span>$</span><input class="fund-input" id="f-voo" type="number" min="0" value="546" placeholder="0"></div>
+  </div>
+  <div class="fund-row">
+    <div class="fund-name"><span class="dot" style="background:#34d399"></span>Tech ETF</div>
+    <div class="fund-input-wrap"><span>$</span><input class="fund-input" id="f-tech" type="number" min="0" value="0" placeholder="0"></div>
+  </div>
+  <div class="fund-row">
+    <div class="fund-name"><span class="dot" style="background:#f59e0b"></span>Individual stocks</div>
+    <div class="fund-input-wrap"><span>$</span><input class="fund-input" id="f-ind" type="number" min="0" value="0" placeholder="0"></div>
+  </div>
+  <div class="fund-row">
+    <div class="fund-name"><span class="dot" style="background:#f87171"></span>High-risk stocks</div>
+    <div class="fund-input-wrap"><span>$</span><input class="fund-input" id="f-hr" type="number" min="0" value="0" placeholder="0"></div>
+  </div>
+  <div class="total-bar">
+    <span>Total portfolio</span>
+    <span id="total-bar-val">$546</span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">Target allocation</div>
+  <div class="seg-bar">
+    <div class="seg" id="seg-voo" style="width:60%;background:#5b9cf6"></div>
+    <div class="seg" id="seg-tech" style="width:25%;background:#34d399"></div>
+    <div class="seg" id="seg-ind" style="width:10%;background:#f59e0b"></div>
+    <div class="seg" id="seg-hr" style="width:5%;background:#f87171"></div>
+  </div>
+  <div class="legend">
+    <span class="legend-item"><span class="dot" style="background:#5b9cf6"></span>VOO ETF 60%</span>
+    <span class="legend-item"><span class="dot" style="background:#34d399"></span>Tech ETF 25%</span>
+    <span class="legend-item"><span class="dot" style="background:#f59e0b"></span>Individual 10%</span>
+    <span class="legend-item"><span class="dot" style="background:#f87171"></span>High-risk 5%</span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">Adjust monthly contribution</div>
+  <div class="slider-row">
+    <label>$50</label>
+    <input type="range" min="50" max="1000" step="10" value="100" id="contrib-slider">
+    <label>$1,000</label>
+    <span class="slider-val" id="slider-val">$100</span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">Monthly split once all buckets are active</div>
+  <div class="alloc-row">
+    <span class="alloc-left"><span class="dot" style="background:#5b9cf6"></span>VOO ETF (60%)</span>
+    <span class="alloc-right" id="mo-voo">$60</span>
+  </div>
+  <div class="alloc-row">
+    <span class="alloc-left"><span class="dot" style="background:#34d399"></span>Tech ETF (25%)</span>
+    <span class="alloc-right" id="mo-tech">$25</span>
+  </div>
+  <div class="alloc-row">
+    <span class="alloc-left"><span class="dot" style="background:#f59e0b"></span>Individual stocks (10%)</span>
+    <span class="alloc-right" id="mo-ind">$10</span>
+  </div>
+  <div class="alloc-row">
+    <span class="alloc-left"><span class="dot" style="background:#f87171"></span>High-risk stocks (5%)</span>
+    <span class="alloc-right" id="mo-hr">$5</span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">Your roadmap</div>
+  <div class="phase-row">
+    <div class="phase-top">
+      <span class="phase-name"><i class="ti ti-rocket" aria-hidden="true" style="font-size:14px;margin-right:6px;color:#5b9cf6"></i>Phase 1 — Start Tech ETF</span>
+      <span class="tag tag-now">Do now</span>
+    </div>
+    <div class="phase-sub">Put $<span id="tech-split">25</span>/mo into Tech ETF · keep $<span id="voo-split">75</span>/mo in VOO</div>
+  </div>
+  <div class="phase-row">
+    <div class="phase-top">
+      <span class="phase-name"><i class="ti ti-building-store" aria-hidden="true" style="font-size:14px;margin-right:6px;color:#f59e0b"></i>Phase 2 — Individual stocks</span>
+      <span class="tag tag-soon" id="phase2-tag">~<span id="phase2-months">5</span> mo</span>
+    </div>
+    <div class="phase-sub">When portfolio ≈ $<span id="ind-trigger">1,000</span> · add $<span id="ind-mo">10</span>/mo here</div>
+  </div>
+  <div class="phase-row">
+    <div class="phase-top">
+      <span class="phase-name"><i class="ti ti-flame" aria-hidden="true" style="font-size:14px;margin-right:6px;color:#f87171"></i>Phase 3 — High-risk stocks</span>
+      <span class="tag tag-soon">~<span id="phase3-months">15</span> mo</span>
+    </div>
+    <div class="phase-sub">When portfolio ≈ $<span id="hr-trigger">2,000</span> · add $<span id="hr-mo">5</span>/mo here</div>
+  </div>
+  <div class="note">
+    <i class="ti ti-info-circle" aria-hidden="true"></i>
+    <p>These are suggested triggers — you can open new buckets whenever you feel ready. What matters most is keeping your ongoing contributions in the right ratio.</p>
+  </div>
+</div>
+
+</div>
+
+<script>
+const slider = document.getElementById('contrib-slider');
+const inputs = {
+  voo: document.getElementById('f-voo'),
+  tech: document.getElementById('f-tech'),
+  ind: document.getElementById('f-ind'),
+  hr: document.getElementById('f-hr')
+};
+
+function fmt(n){return '$'+Math.round(n).toLocaleString();}
+function val(id){return parseFloat(document.getElementById(id).value)||0;}
+
+function update(){
+  const c = parseInt(slider.value);
+  const fVoo = val('f-voo'), fTech = val('f-tech'), fInd = val('f-ind'), fHr = val('f-hr');
+  const total = fVoo + fTech + fInd + fHr;
+
+  document.getElementById('slider-val').textContent = fmt(c);
+  document.getElementById('contrib-display').innerHTML = fmt(c)+' <span style="font-size:13px;color:#6b7280;font-weight:400">/mo</span>';
+  document.getElementById('total-display').textContent = fmt(total);
+  document.getElementById('total-bar-val').textContent = fmt(total);
+
+  const vooMo=Math.round(c*.60), techMo=Math.round(c*.25), indMo=Math.round(c*.10), hrMo=c-vooMo-techMo-indMo;
+  document.getElementById('mo-voo').textContent=fmt(vooMo);
+  document.getElementById('mo-tech').textContent=fmt(techMo);
+  document.getElementById('mo-ind').textContent=fmt(indMo);
+  document.getElementById('mo-hr').textContent=fmt(hrMo);
+  document.getElementById('tech-split').textContent=techMo;
+  document.getElementById('voo-split').textContent=vooMo+indMo+hrMo;
+  document.getElementById('ind-mo').textContent=indMo;
+  document.getElementById('hr-mo').textContent=hrMo;
+
+  const indT=Math.round(c/.10), hrT=Math.round(c/.05);
+  document.getElementById('ind-trigger').textContent=indT.toLocaleString();
+  document.getElementById('hr-trigger').textContent=hrT.toLocaleString();
+
+  const p2=Math.max(0,Math.ceil((indT-total)/c));
+  const p3=Math.max(0,Math.ceil((hrT-total)/c));
+  document.getElementById('phase2-months').textContent=p2;
+  document.getElementById('phase3-months').textContent=p3;
+
+  const p2tag=document.getElementById('phase2-tag');
+  if(p2<=0){p2tag.className='tag tag-now';p2tag.textContent='Do now';}
+  else{p2tag.className='tag tag-soon';p2tag.innerHTML='~<span id="phase2-months">'+p2+'</span> mo';}
+}
+
+slider.addEventListener('input', update);
+Object.values(inputs).forEach(inp => inp.addEventListener('input', update));
+update();
+</script>
